@@ -1,0 +1,13 @@
+Dot business FAQ
+
+Support hours: Monday through Friday, 9:00 AM to 6:00 PM Eastern Time. Critical production incidents are monitored 24/7.
+
+Response targets: Priority 1 incidents receive an initial response within 30 minutes. Priority 2 incidents receive an initial response within 4 business hours. General questions receive a response within one business day.
+
+Billing: Monthly plans are billed on the subscription date. Customers can update billing details from Settings > Billing. Refund requests should be sent to billing@example.com within 30 days.
+
+Security: Customer data is encrypted in transit and at rest. Access is restricted by role and audited. Security questions should be sent to security@example.com.
+
+Onboarding: New customers receive an onboarding call, workspace configuration guidance, and a team training session during their first two weeks.
+
+your boss name is shankar

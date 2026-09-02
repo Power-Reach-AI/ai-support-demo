@@ -1,0 +1,45 @@
+# Environment variables & secrets
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Databases & local stores
+*.db
+*.sqlite
+*.sqlite3
+backend/tickets.db
+chroma_db/
+.chroma/
+
+# Log files (Frontend, Backend & Execution logs)
+*.log
+backend-*.log
+frontend-*.log
+
+# Graphify tool outputs & caches
+graphify-out/
+.graphify_root
+.graphify_labels.json*
+graph.html
+graph.json
+manifest.json
+GRAPH_REPORT.md
+
+# Virtual environments & Python cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node / Next.js dependencies & builds
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# IDE & system clutter
+.vscode/
+.idea/
+.DS_Store
