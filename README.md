@@ -1,4 +1,4 @@
-# Northstar AI chatbot demo
+# AI chatbot demo
 
 Minimal production-oriented demo with a FastAPI/LangChain backend and a Next.js App Router frontend. The API keeps in-memory history by `session_id` and streams Claude output as SSE.
 
