@@ -49,9 +49,9 @@ async def health() -> dict[str, str]:
 @app.post("/api/chat")
 async def chat(request: ChatRequest) -> StreamingResponse:
     """Stream a session-aware assistant response as server-sent events."""
-    api_key = os.getenv("ANTHROPIC_API_KEY", "").strip().strip("\"'").strip()
+    api_key = os.getenv("GEMINI_API_KEY", "").strip().strip("\"'").strip()
     if not api_key:
-        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY is not configured")
+        raise HTTPException(status_code=503, detail="GEMINI_API_KEY is not configured")
 
     async def events() -> AsyncIterator[str]:
         """Yield token events and keep provider failures parseable by the client."""

@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", message="`langchain-community` is being sunset
 from chromadb.config import Settings
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-from langchain_anthropic import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.document_loaders import TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_core.embeddings import Embeddings
@@ -23,12 +23,12 @@ from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langgraph.checkpoint.memory import InMemorySaver
 
-from .db import save_ticket
+from .db import save_lead, save_ticket
 
-SYSTEM_PROMPT = "You are Dot, a concise business assistant. Give direct, factual answers based on provided context. Be professional, brief, and never offer long filler text. If the user asks for human support, expresses frustration, or encounters an unresolved issue, ask for their email address for contact purposes if they have not provided it, then immediately invoke create_support_ticket once you have it."
+SYSTEM_PROMPT = "You are Dot, a concise business assistant. Give direct, factual answers based on provided context. Be professional, brief, and never offer long filler text. When human escalation is needed, collect the user's full name, email address, company or team name, phone number if available, a short issue summary, and urgency as Low, Medium, or High. Call capture_lead FIRST after collecting these details. Only after capture_lead succeeds may you call create_support_ticket."
 
 load_dotenv(dotenv_path=Path(__file__).with_name(".env"))
-api_key = os.getenv("ANTHROPIC_API_KEY", "").strip().strip("\"'").strip()
+api_key = os.getenv("GEMINI_API_KEY", "").strip().strip("\"'").strip()
 
 
 class HashEmbeddings(Embeddings):
@@ -69,6 +69,26 @@ def get_retriever() -> VectorStoreRetriever:
 
 
 @tool
+def capture_lead(
+    name: str,
+    email: str,
+    company: str = None,
+    phone: str = None,
+    issue_summary: str = None,
+    urgency: str = "medium",
+) -> str:
+    """Save customer contact and qualification details before ticket creation."""
+    return save_lead(
+        name=name,
+        email=email,
+        company=company,
+        phone=phone,
+        issue_summary=issue_summary,
+        urgency=urgency,
+    )
+
+
+@tool
 def create_support_ticket(user_name: str, issue_description: str, email: str, priority: str = "medium") -> str:
     """Create an open support ticket for human follow-up."""
     ticket_id = save_ticket(user_name, issue_description, priority, email)
@@ -83,12 +103,17 @@ def create_support_ticket(user_name: str, issue_description: str, email: str, pr
     return f"Support ticket {ticket_id} created successfully."
 
 
-primary_model = ChatAnthropic(model="claude-haiku-4-5", temperature=0.1, streaming=True, api_key=api_key or None)
-chat_model = primary_model.bind_tools([create_support_ticket])
+llm = ChatGoogleGenerativeAI(
+    model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
+    google_api_key=api_key or None,
+    temperature=0.3,
+    streaming=True,
+)
+chat_model = llm.bind_tools([capture_lead, create_support_ticket])
 
 agent = create_agent(
     model=chat_model,
-    tools=[create_support_ticket],
+    tools=[capture_lead, create_support_ticket],
     system_prompt=SYSTEM_PROMPT,
     checkpointer=InMemorySaver(),
     name="dot_support_agent",
